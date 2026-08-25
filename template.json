@@ -1,0 +1,50 @@
+{
+  "$schema": "https://railway.com/template.schema.json",
+  "description": "InvoicePlane — Self-hosted open source invoicing application with MariaDB. One-click deploy to Railway.",
+  "services": {
+    "InvoicePlane": {
+      "source": {
+        "image": "funktionslust/invoiceplane:1.6.5"
+      },
+      "variables": {
+        "IP_URL": "${{RAILWAY_PUBLIC_DOMAIN}}",
+        "DB_HOSTNAME": "${{MariaDB.MARIADB_HOST}}",
+        "DB_USERNAME": "${{MariaDB.MARIADB_USER}}",
+        "DB_PASSWORD": "${{MariaDB.MARIADB_PASSWORD}}",
+        "DB_DATABASE": "${{MariaDB.MARIADB_DATABASE}}",
+        "DB_PORT": "${{MariaDB.MARIADB_PORT}}",
+        "ENCRYPTION_KEY": "${{secret(43, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/\")}}=",
+        "CI_ENV": "production",
+        "ENABLE_DEBUG": "false",
+        "DEFAULT_LANGUAGE": "english",
+        "DEFAULT_ADMIN_EMAIL": "admin@localhost",
+        "TZ": "UTC",
+        "COOKIE_SECURE": "true",
+        "X_FRAME_OPTIONS": "SAMEORIGIN",
+        "ENABLE_X_CONTENT_TYPE_OPTIONS": "true",
+        "SESS_MATCH_IP": "true",
+        "SESS_REGENERATE_DESTROY": "true"
+      },
+      "healthcheckPath": "/",
+      "healthcheckTimeout": 300,
+      "volumes": [
+        "/var/www/html/uploads",
+        "/var/www/html/storage"
+      ]
+    },
+    "MariaDB": {
+      "source": {
+        "image": "mariadb:lts"
+      },
+      "variables": {
+        "MARIADB_ROOT_PASSWORD": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+        "MARIADB_DATABASE": "invoiceplane",
+        "MARIADB_USER": "invoiceplane",
+        "MARIADB_PASSWORD": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}"
+      },
+      "volumes": [
+        "/var/lib/mysql"
+      ]
+    }
+  }
+}
