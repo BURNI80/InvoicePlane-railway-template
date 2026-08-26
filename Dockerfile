@@ -1,3 +1,7 @@
 FROM funktionslust/invoiceplane:1.6.5
 
-RUN a2dismod mpm_event mpm_worker && a2enmod mpm_prefork
+COPY entrypoint-wrapper.sh /entrypoint-wrapper.sh
+RUN chmod +x /entrypoint-wrapper.sh
+
+ENTRYPOINT ["/entrypoint-wrapper.sh"]
+CMD ["apache2-foreground"]
