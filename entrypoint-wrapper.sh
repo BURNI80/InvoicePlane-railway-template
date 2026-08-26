@@ -9,4 +9,4 @@ if [ -n "$PORT" ]; then
   sed -i "s/:80/:$PORT/" /etc/apache2/sites-available/000-default.conf
 fi
 
-exec /docker-entrypoint.sh "$@"
+exec /usr/local/bin/docker-entrypoint.sh "$@"
