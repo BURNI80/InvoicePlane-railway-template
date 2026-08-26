@@ -4,29 +4,30 @@
   "services": {
     "InvoicePlane": {
       "source": {
-        "image": "funktionslust/invoiceplane:1.6.5"
+        "github": {
+          "repo": "BURNI80/InvoicePlane-railway-template",
+          "branch": "master"
+        }
       },
       "variables": {
         "IP_URL": "${{RAILWAY_PUBLIC_DOMAIN}}",
-        "DB_HOSTNAME": "${{MariaDB.MARIADB_HOST}}",
-        "DB_USERNAME": "${{MariaDB.MARIADB_USER}}",
-        "DB_PASSWORD": "${{MariaDB.MARIADB_PASSWORD}}",
-        "DB_DATABASE": "${{MariaDB.MARIADB_DATABASE}}",
-        "DB_PORT": "${{MariaDB.MARIADB_PORT}}",
-        "ENCRYPTION_KEY": "${{secret(43, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/\")}}=",
+        "IP_DB_HOSTNAME": "${{MariaDB.MARIADB_HOST}}",
+        "IP_DB_USERNAME": "${{MariaDB.MARIADB_USER}}",
+        "IP_DB_PASSWORD": "${{MariaDB.MARIADB_PASSWORD}}",
+        "IP_DB_DATABASE": "${{MariaDB.MARIADB_DATABASE}}",
+        "IP_DB_PORT": "${{MariaDB.MARIADB_PORT}}",
+        "ENCRYPTION_KEY": "${{secret(32)}}",
         "CI_ENV": "production",
         "ENABLE_DEBUG": "false",
         "DEFAULT_LANGUAGE": "english",
         "DEFAULT_ADMIN_EMAIL": "admin@localhost",
         "TZ": "UTC",
-        "COOKIE_SECURE": "true",
         "X_FRAME_OPTIONS": "SAMEORIGIN",
         "ENABLE_X_CONTENT_TYPE_OPTIONS": "true",
         "SESS_MATCH_IP": "true",
         "SESS_REGENERATE_DESTROY": "true"
       },
-      "healthcheckPath": "/",
-      "healthcheckTimeout": 300,
+      "sleepApplication": true,
       "volumes": [
         "/var/www/html/uploads",
         "/var/www/html/storage"
@@ -34,13 +35,13 @@
     },
     "MariaDB": {
       "source": {
-        "image": "mariadb:lts"
+        "image": "mariadb:11.4"
       },
       "variables": {
-        "MARIADB_ROOT_PASSWORD": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+        "MARIADB_ROOT_PASSWORD": "${{secret(24)}}",
         "MARIADB_DATABASE": "invoiceplane",
         "MARIADB_USER": "invoiceplane",
-        "MARIADB_PASSWORD": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}"
+        "MARIADB_PASSWORD": "${{secret(24)}}"
       },
       "volumes": [
         "/var/lib/mysql"

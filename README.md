@@ -7,7 +7,7 @@ Deploy [InvoicePlane](https://www.invoiceplane.com/) on [Railway](https://railwa
 | Service | Image | Purpose |
 |---------|-------|---------|
 | **InvoicePlane** | `funktionslust/invoiceplane:1.6.5` | Web invoicing application |
-| **MariaDB** | `mariadb:lts` | Persistent database |
+| **MariaDB** | `mariadb:11.4` | Persistent database |
 
 ## Estimated Cost
 
@@ -46,12 +46,12 @@ Runs within Railway's **free tier** ($5/month credit included). Typical usage: ~
             │
 ┌───────────▼─────────────┐     Private Network     ┌──────────────────┐
 │     InvoicePlane        │ ◄──────────────────────► │     MariaDB      │
-│  funktionslust/         │    mariadb.lts           │   mariadb:lts    │
-│  invoiceplane:1.6.5     │   (port 3306)            │                  │
+│  Custom Dockerfile      │    mariadb:11.4          │   mariadb:11.4   │
+│  (MPM prefork fix)      │   (port 3306)            │                  │
 │                         │                          │  Volume: /var/   │
 │  Volume: /var/www/html/ │                          │  lib/mysql       │
-│  uploads                │                          │                  │
-│  Volume: /var/www/html/ │                          └──────────────────┘
+│  uploads                │                          └──────────────────┘
+│  Volume: /var/www/html/ │
 │  storage                │
 └─────────────────────────┘
 ```
@@ -75,14 +75,16 @@ All variables are auto-configured by the template. No manual setup required.
 | Variable | Source | Description |
 |----------|--------|-------------|
 | `IP_URL` | Auto-set | Public application URL |
-| `DB_HOSTNAME` | Reference | MariaDB hostname (private network) |
-| `DB_USERNAME` | Reference | Database user |
-| `DB_PASSWORD` | Auto-generated | Database password |
-| `DB_DATABASE` | Reference | Database name |
+| `IP_DB_HOSTNAME` | Reference | MariaDB hostname (private network) |
+| `IP_DB_USERNAME` | Reference | Database user |
+| `IP_DB_PASSWORD` | Auto-generated | Database password |
+| `IP_DB_DATABASE` | Reference | Database name |
+| `IP_DB_PORT` | Reference | Database port |
 | `ENCRYPTION_KEY` | Auto-generated | Application encryption key |
-| `DEFAULT_LANGUAGE` | Default: `english` | Initial admin language |
-| `DEFAULT_ADMIN_EMAIL` | Default: `admin@localhost` | Admin email |
-| `DEFAULT_ADMIN_PASSWORD` | Auto-generated | Admin password (shown in logs) |
+| `CI_ENV` | `production` | Environment mode |
+| `DEFAULT_LANGUAGE` | `english` | Initial admin language |
+| `DEFAULT_ADMIN_EMAIL` | `admin@localhost` | Admin email |
+| `TZ` | `UTC` | Timezone |
 
 ## Persistent Volumes
 
@@ -101,7 +103,7 @@ All variables are auto-configured by the template. No manual setup required.
 
 ### Database connection errors
 - MariaDB may take 30-60 seconds to initialize on first deploy
-- Check that `DB_HOSTNAME` points to the MariaDB service via private network
+- Check that `IP_DB_HOSTNAME` points to the MariaDB service via private network
 - Verify MariaDB volume is properly mounted
 
 ### PDF generation issues
@@ -112,10 +114,15 @@ All variables are auto-configured by the template. No manual setup required.
 - Check that the `/var/www/html/uploads` volume is mounted
 - Verify PHP upload limits in container settings
 
+## Technical Notes
+
+- **Custom Dockerfile**: Adds an entrypoint wrapper that fixes Apache MPM conflicts (Railway's PHP base image loads multiple MPMs). The wrapper disables `mpm_event` and `mpm_worker`, enables `mpm_prefork`, then delegates to the original entrypoint.
+- **No healthcheck configured**: InvoicePlane returns a 307 redirect to the setup wizard during initial setup, which Railway interprets as unhealthy. The app works correctly — the redirect resolves to 200 after setup completion.
+
 ## Versioning
 
 - **InvoicePlane**: `1.6.5` (pinned — not using `:latest`)
-- **MariaDB**: `lts` (Long Term Support)
+- **MariaDB**: `11.4` (pinned)
 
 ## License
 
