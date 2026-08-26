@@ -8,4 +8,4 @@ a2dismod mpm_event mpm_worker 2>/dev/null || true
 a2enmod mpm_prefork 2>/dev/null || true
 
 # Execute the original entrypoint
-exec /usr/local/bin/docker-entrypoint.sh "$@"
+exec /docker-entrypoint.sh "$@"
