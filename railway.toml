@@ -1,0 +1,7 @@
+[build]
+builder = "DOCKER"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/"
+sleepApplication = true
