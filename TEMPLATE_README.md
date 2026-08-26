@@ -1,73 +1,71 @@
-# InvoicePlane on Railway
+# Deploy and Host InvoicePlane on Railway
 
 Deploy [InvoicePlane](https://invoiceplane.com) — a free, open-source, self-hosted invoicing application — on Railway with MariaDB in one click.
 
-## What's Included
+## About Hosting InvoicePlane on Railway
 
-- **InvoicePlane** — Full invoicing app with client management, quotes, invoices, and payments
-- **MariaDB 11.4** — Persistent database for all your data
-- **Persistent volumes** — Uploads and database survive redeployments
-- **Auto-generated secrets** — Encryption key and database passwords created automatically
+InvoicePlane is a complete invoicing solution for freelancers and small businesses. Running it on Railway gives you a fully managed, always-available invoicing platform without managing servers.
+
+This template deploys:
+
+- **InvoicePlane 1.6.5** — The invoicing web application (PHP/Apache)
+- **MariaDB 11.4** — Persistent relational database
+
+Both services run within Railway's free tier (~$1/month total).
+
+## Why Deploy InvoicePlane on Railway?
+
+- **Zero configuration** — All environment variables are auto-generated (database credentials, encryption keys, URLs)
+- **Persistent storage** — Uploads, attachments, and database data survive redeployments
+- **Sleep mode** — Services sleep when idle to minimize costs
+- **Private networking** — Database communicates over Railway's private network, never exposed publicly
+- **One-click deploy** — No terminal commands or manual setup required
+
+## Common Use Cases
+
+- Freelancer invoicing and billing
+- Small business quote and invoice management
+- Client management with contact history
+- Payment tracking (PayPal, Stripe)
+- PDF invoice generation
+- E-invoice support (ZUGFeRD, Factur-X, UBL, FacturaE, FatturaPA)
+
+## Dependencies for InvoicePlane
+
+### Deployment Dependencies
+
+- **MariaDB 11.4** — InvoicePlane requires a MySQL-compatible database
+- **Persistent Volumes** — Three volumes for data persistence:
+  - `/var/lib/mysql` (MariaDB data)
+  - `/var/www/html/uploads` (InvoicePlane file uploads)
+  - `/var/www/html/storage` (InvoicePlane cache and sessions)
+
+### Network Dependencies
+
+- InvoicePlane connects to MariaDB via Railway's private network
+- A public domain is auto-generated for web access
+- No incoming port configuration required
 
 ## Quick Start
 
-1. Click **Deploy Template** below
+1. Click **Deploy Template**
 2. Wait ~2 minutes for both services to start
 3. Open the generated InvoicePlane URL
-4. Complete the InvoicePlane setup wizard (create admin account, company info)
+4. Complete the setup wizard (create admin account, company info)
 5. Start invoicing!
-
-## Variables
-
-All variables are auto-configured. No manual setup needed.
-
-| Variable | Description |
-|----------|-------------|
-| `IP_URL` | Auto-set to your public domain |
-| `IP_DB_HOSTNAME` | References MariaDB automatically |
-| `IP_DB_USERNAME` | References MariaDB automatically |
-| `IP_DB_PASSWORD` | Auto-generated secret |
-| `IP_DB_DATABASE` | `invoiceplane` |
-| `ENCRYPTION_KEY` | Auto-generated 32-char secret |
-| `CI_ENV` | `production` |
-| `TZ` | `UTC` |
 
 ## Post-Deployment
 
-After the first deploy:
+After the first deploy, open your InvoicePlane URL. The setup wizard guides you through:
 
-1. Open your InvoicePlane URL
-2. The setup wizard will guide you through:
-   - Creating your admin account
-   - Setting company details
-   - Configuring currency and tax settings
-3. Start adding clients and creating invoices
+- Creating your admin account
+- Setting company details
+- Configuring currency and tax settings
 
-## Persistence
-
-| Volume | Mount Path | Purpose |
-|--------|------------|---------|
-| MariaDB data | `/var/lib/mysql` | Database files |
-| InvoicePlane uploads | `/var/www/html/uploads` | Uploaded files, attachments |
-| InvoicePlane storage | `/var/www/html/storage` | Application cache, sessions |
-
-## Cost Estimate
-
-This template runs within the Railway free tier ($5/month credit):
-
-- **InvoicePlane**: ~$0.50/month (light usage, sleeps when idle)
-- **MariaDB**: ~$0.50/month (small database)
-- **Total**: ~$1/month
+Then start adding clients and creating invoices.
 
 ## Technical Details
 
-- **InvoicePlane** v1.6.5 via [funktionslust/invoiceplane](https://github.com/funktionslust/invoiceplane-docker) Docker image
-- Custom entrypoint fixes Apache MPM conflicts for Railway compatibility
-- MariaDB 11.4 with persistent storage
+- **Custom Dockerfile** fixes Apache MPM conflicts for Railway compatibility (disables `mpm_event`/`mpm_worker`, enables `mpm_prefork`)
+- No healthcheck path configured (InvoicePlane redirects to setup wizard during initial setup)
 - Sleep mode enabled to minimize costs when idle
-
-## Links
-
-- [InvoicePlane](https://invoiceplane.com)
-- [InvoicePlane GitHub](https://github.com/InvoicePlane/InvoicePlane)
-- [Railway](https://railway.app)
