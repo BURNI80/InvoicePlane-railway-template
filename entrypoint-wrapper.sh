@@ -9,4 +9,14 @@ if [ -n "$PORT" ]; then
   sed -i "s/:80/:$PORT/" /etc/apache2/sites-available/000-default.conf
 fi
 
-exec /usr/local/bin/docker-entrypoint.sh "$@"
+mkdir -p /var/lib/php/sessions
+chmod 1733 /var/lib/php/sessions
+chown www-data:www-data /var/lib/php/sessions
+
+/usr/local/bin/docker-entrypoint.sh /bin/bash -c '
+if [ -f /var/www/html/ipconfig.php ]; then
+  sed -i "s/^SESS_MATCH_IP=.*/SESS_MATCH_IP=false/" /var/www/html/ipconfig.php
+  sed -i "s/^SESS_REGENERATE_DESTROY=.*/SESS_REGENERATE_DESTROY=false/" /var/www/html/ipconfig.php
+fi
+exec apache2-foreground
+'
